@@ -1,0 +1,28 @@
+CLEANED DATA
+ ID    Name  Age  Net worth Country  Salary  Join Date
+  1   Alice 25.0    30000.0      NZ 55000.0 2020-01-15
+  2     Bob 30.0    35000.0      NZ 60000.0 2020-02-20
+  3     Eve 29.0    22000.0     AUS 59000.0 2019-01-13
+  4 Charlie 35.0    40000.0     AUS 72000.0        NaT
+  5   David 38.0        NaN      NZ 68000.0 2019-11-01
+  7 Unknown 40.0    55000.0      NZ 65000.0 2018-05-30
+  8   Grace 22.0    28000.0 Unknown 64000.0 2021-07-25
+ 10    Ivan 27.0    60000.0      NZ 58000.0 2019-03-15
+
+RESULTS
+Age: n=8  mean=30.75  median=29.50  var=35.44  std=5.95
+Net worth: n=7  mean=38,571.43  median=35,000.00  var=171,959,183.67  std=13,113.32
+Salary: n=8  mean=62,625.00  median=62,000.00  var=27,984,375.00  std=5,290.03
+
+Age vs Salary: cov=22,607.14  r=0.628
+Age vs Net worth: cov=41,857.14  r=0.484
+Salary vs Net worth: cov=12,261,904.76  r=0.153
+
+n            count of values
+mean         typical value (sum / n)
+median       middle value; less affected by outliers
+variance     spread, in squared units
+std          typical distance from the mean
+covariance   + together, - opposite; look at the sign
+correlation  same idea, scaled to -1 to +1
+
