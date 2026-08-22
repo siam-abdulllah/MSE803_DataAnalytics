@@ -1,0 +1,73 @@
+RETRIEVED WITHOUT A MODEL
+  Bob: merged duplicate rows -> Age=30, Net worth=35,000, Salary=60,000
+  David: Age text 'thirty-eight' -> 38
+  Eve: invalid date 2019-13-01 -> 2019-01-13; missing ID -> 3
+  Row 7: Salary text 'sixty five thousand' -> 65,000
+  Country AU -> AUS; blank Country -> Unknown; blank Name -> Unknown
+
+STILL MISSING AFTER RETRIEVAL
+  David: Net worth (Age=38, Salary=68,000)  <-- can be modelled
+  Charlie: Join Date (Age=35, Salary=72,000) <-- can be modelled as a date
+  Heidi: Age, Net worth, Salary all missing  <-- no numeric predictors
+  Grace: Country is categorical, not a regression target
+
+CLEANED DATA (before imputation)
+ ID    Name  Age  Net worth Country  Salary  Join Date
+  1   Alice 25.0    30000.0      NZ 55000.0 2020-01-15
+  2     Bob 30.0    35000.0      NZ 60000.0 2020-02-20
+  3     Eve 29.0    22000.0     AUS 59000.0 2019-01-13
+  4 Charlie 35.0    40000.0     AUS 72000.0        NaT
+  5   David 38.0        NaN      NZ 68000.0 2019-11-01
+  7 Unknown 40.0    55000.0      NZ 65000.0 2018-05-30
+  8   Grace 22.0    28000.0 Unknown 64000.0 2021-07-25
+ 10    Ivan 27.0    60000.0      NZ 58000.0 2019-03-15
+
+CORRELATIONS ON COMPLETE ROWS (n=7)
+  Age vs Net worth : r = 0.484
+  Salary vs Net worth: r = 0.153
+  Age vs Salary    : r = 0.551
+  Age is the stronger predictor of Net worth, so it is the primary feature.
+
+MODEL COMPARISON — predicting Net worth
+Model                       In-sample R2  In-sample RMSE   LOOCV R2   LOOCV RMSE   LOOCV MAE
+Linear  (Age)                      0.235          11,473     -0.222       14,497      11,297
+Poly-2  (Age)                      0.251          11,348     -0.985       18,474      15,294
+Linear  (Age + Salary)             0.253          11,334     -0.329       15,119      11,852
+Poly-2  (Age + Salary)             0.979           1,922   -446.698      277,463     185,944
+
+DAVID — predicted Net worth (Age=38, Salary=68,000)
+  Linear  (Age): $47,885
+    Net worth = 5,171 + 1,124 * Age
+  Poly-2  (Age): $48,555
+    Net worth = 55,183 + -2,201.14 * Age + 53.33 * Age^2
+  Linear  (Age + Salary): $47,099
+    Net worth = 24,236 + 1,332 * Age + -0.41 * Salary
+  Poly-2  (Age + Salary): $177,664
+    Net worth = -6,475,844 + -400,620.91 * Age + 395.34 * Salary + -1,120.91 * Age^2 + 7.31 * Age Salary + -0.00 * Salary^2
+
+CHARLIE — predicted Join Date from Age
+  Age vs Join Date (ordinal): r = -0.655  (older staff joined earlier)
+  Linear LOOCV RMSE: 379 days   Poly-2 LOOCV RMSE: 518 days
+  Linear prediction : 2019-04-05
+  Poly-2 prediction : 2018-12-16
+
+LEAVE-ONE-OUT PREDICTIONS (Age -> Net worth)
+Name           Actual  Linear pred  Linear err  Poly-2 pred  Poly-2 err
+Alice          30,000       34,319       4,319       34,619       4,619
+Bob            35,000       39,543       4,543       38,050       3,050
+Eve            22,000       40,446      18,446       41,390      19,390
+Charlie        40,000       46,164       6,164       45,126       5,126
+Unknown        55,000       42,313     -12,687       31,991     -23,009
+Grace          28,000       31,216       3,216       47,545      19,545
+Ivan           60,000       30,298     -29,702       27,678     -32,322
+
+WHICH METHOD IS BETTER?
+  Best in-sample fit : Poly-2  (Age + Salary)  (R2=0.979) — expected, more flexible models fit noise.
+  Best held-out error: Linear  (Age)  (LOOCV RMSE=$14,497).
+  Worst held-out error: Poly-2  (Age + Salary)  (LOOCV RMSE=$277,463).
+  With only 7 complete rows, polynomial terms (especially Age+Salary interactions) overfit. Linear regression using Age generalises better and is the safer predictor for David's missing Net worth.
+  Recommended imputed Net worth for David: $47,885  (linear, Age only).
+  Recommended imputed Join Date for Charlie: 2019-04-05  (linear, Age only).
+  Heidi cannot be predicted: Age, Net worth and Salary are all missing, so there is no numeric input for either model.
+
+Saved imputed_dataset.csv, networth_regression.png, loocv_errors.png
